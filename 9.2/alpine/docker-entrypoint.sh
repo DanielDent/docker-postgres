@@ -32,6 +32,14 @@ if [ "$1" = 'postgres' ]; then
 	chmod 700 "$PGDATA"
 	chown -R postgres "$PGDATA"
 
+    # Create the transaction log directory before initdb is run (below) so the directory is owend by the correct user
+    if [ "$POSTGRES_XLOG_DIR" ]; then
+        mkdir -p "$POSTGRES_XLOG_DIR"
+        chmod 700 "$POSTGRES_XLOG_DIR"
+        chown -R postgres "$POSTGRES_XLOG_DIR"
+        POSTGRES_INITDB_ARGS="$POSTGRES_INITDB_ARGS --xlogdir $POSTGRES_XLOG_DIR"
+    fi
+
 	mkdir -p /run/postgresql
 	chmod g+s /run/postgresql
 	chown -R postgres /run/postgresql
